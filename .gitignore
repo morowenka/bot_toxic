@@ -1,0 +1,7 @@
+/venv/
+/model/
+/tokenizer/
+/__pycache__/
+/.idea/
+/generate_config.py
+/cfg.ini

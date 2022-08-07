@@ -1,0 +1,65 @@
+import vk_api
+import traceback
+import requests
+import torch
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from vk_bot import VkBot
+from info import ChatsInfo, UsersInfo
+import helper
+import warnings
+
+warnings.filterwarnings('ignore')
+
+_CONFIG = helper.read_config()
+
+RANDOM_STATE = 42
+BOT_GROUP_ID = 214806981  # id группы с ботом
+BUG_CHAT_ID = _CONFIG['VkSettings']['bug_chat_id']  # peer_id чата, в который будут приходить сообщения с ошибками
+TOKEN = _CONFIG['VkSettings']['token']
+
+
+def main():
+    chats, users = ChatsInfo(), UsersInfo()
+    users.create_table()  # создадим сразу таблицу всех пользователей
+    vk = vk_api.VkApi(token=TOKEN)
+    vkbot = VkBot(vk, users, chats)
+
+    print('Bot is ready to start')
+    while True:
+        longpoll = VkBotLongPoll(vk, BOT_GROUP_ID)
+
+        try:
+            for event in longpoll.listen():
+                if event.type == VkBotEventType.MESSAGE_NEW:
+                    event_obj = event.obj.get('message')
+                    user_id = event_obj.get('from_id')
+                    peer_id = event_obj.get('peer_id')
+                    message = event_obj.get('text')
+
+                    if event.from_chat:
+                        chats.create_table(peer_id)
+                        if not chats.is_reg(peer_id, user_id):
+                            chats.insert_user(peer_id, user_id)
+                        if not users.is_reg(user_id):
+                            users.insert_user(**vkbot.get_user_data(user_id))
+
+                    if event.from_user:
+                        if not users.is_reg(user_id):
+                            users.insert_user(**vkbot.get_user_data(user_id))
+
+                    vkbot.new_message(peer_id, user_id, message)
+
+        except requests.exceptions.ReadTimeout as timeout:
+            continue
+
+        except Exception as e:
+            error = f'&#9888; Ошибка: {e}\n\
+                  &#128169; Пользователь: {vkbot.get_user_fullname(user_id)}\n\
+                  &#129511; Беседа: {peer_id}\n\
+                  &#128140; Текст сообщения: {message}\n\n\
+                  &#9881; Описание ошибки:\n\n {traceback.format_exc()}'
+            vkbot.send_message(BUG_CHAT_ID, error)
+
+
+if __name__ == '__main__':
+    main()
