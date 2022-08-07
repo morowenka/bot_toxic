@@ -2,6 +2,7 @@ import torch.nn.functional as F
 from vk_api.utils import get_random_id
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
+from datetime import date
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -110,8 +111,32 @@ class VkBot:
         return f'@id{user_id} ({self.vk.method("users.get", {"user_ids": user_id})[0].get("first_name")})'
 
     def get_user_fullname(self, user_id):
-        data = self.vk.method("users.get", {"user_ids": user_id})[0]
-        return f'@id{user_id} ({data.get("first_name") + " " + data.get("last_name")})'
+        user_data = self.vk.method("users.get", {"user_ids": user_id})[0]
+        return f'@id{user_id} ({user_data.get("first_name") + " " + user_data.get("last_name")})'
+
+    def get_user_data(self, user_id):
+
+        user_data = self.vk.method("users.get", {"user_ids": user_id,
+                                                 "fields": 'first_name, last_name, sex, bdate, '
+                                                           'country, city, personal, relation'})[0]
+        user_dict_data = {
+            'user_id': user_id,
+            'user_name': user_data.get("first_name"),
+            'user_surname': user_data.get("last_name"),
+            'user_first_login_date': date.isoformat(date.today()),
+            'user_sex': user_data.get("sex"),
+            'user_bdate': "-".join(user_data.get("bdate").split('.')[::-1]),
+            'user_country': user_data.get("country").get("title"),
+            'user_city': user_data.get("city").get("title"),
+            'user_political': user_data.get("personal").get("political"),
+            'user_religion': user_data.get("personal").get("religion"),
+            'user_relation': user_data.get("relation"),
+            'user_people_main': user_data.get("personal").get("people_main"),
+            'user_life_main': user_data.get("personal").get("life_main"),
+            'user_smoking': user_data.get("personal").get("smoking"),
+            'user_alcohol': user_data.get("personal").get("alcohol"),
+        }
+        return user_dict_data
 
     def compute_toxicity(self, message):
         input = tokenizer.encode(message, return_tensors='pt')

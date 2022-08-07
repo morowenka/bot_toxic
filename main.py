@@ -5,14 +5,17 @@ import torch
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_bot import VkBot
 from info import ChatsInfo, UsersInfo
+import helper
 import warnings
 
 warnings.filterwarnings('ignore')
 
+_CONFIG = helper.read_config()
+
 RANDOM_STATE = 42
-BUG_CHAT_ID = 378102106  # peer_id чата, в который будут приходить сообщения с ошибками
 BOT_GROUP_ID = 214806981  # id группы с ботом
-TOKEN = "vk1.a.zidAFdRn1-ggq9-c4xQJyvS6DPLMHmU3iSwW5Ew9esCKT7WvLgb3AmIZwwn5HUAcp-NelrV16icHDm-85T65xiZ0y_X9387hOG4opbOA-b_xpiGiMchMyP2oJdsduKsdkpXOWu8iE1JiB8BghgIUxPjt6XuwfychURy5Ga_ocVwXD9IpdNA4ieIkxnnSnnhT"
+BUG_CHAT_ID = _CONFIG['VkSettings']['bug_chat_id']  # peer_id чата, в который будут приходить сообщения с ошибками
+TOKEN = _CONFIG['VkSettings']['token']
 
 
 def main():
@@ -21,6 +24,7 @@ def main():
     vk = vk_api.VkApi(token=TOKEN)
     vkbot = VkBot(vk, users, chats)
 
+    print('Bot is ready to start')
     while True:
         longpoll = VkBotLongPoll(vk, BOT_GROUP_ID)
 
@@ -37,11 +41,11 @@ def main():
                         if not chats.is_reg(peer_id, user_id):
                             chats.insert_user(peer_id, user_id)
                         if not users.is_reg(user_id):
-                            users.insert_user(user_id)
+                            users.insert_user(**vkbot.get_user_data(user_id))
 
                     if event.from_user:
                         if not users.is_reg(user_id):
-                            users.insert_user(user_id)
+                            users.insert_user(**vkbot.get_user_data(user_id))
 
                     vkbot.new_message(peer_id, user_id, message)
 

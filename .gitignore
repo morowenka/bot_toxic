@@ -2,4 +2,6 @@
 /model/
 /tokenizer/
 /__pycache__/
-/.idea/workspace.xml
+/.idea/
+/generate_config.py
+/cfg.ini
