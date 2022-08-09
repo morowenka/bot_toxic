@@ -7,13 +7,15 @@ from datetime import date
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 try:
-    tokenizer = BertTokenizer.from_pretrained('D:/PROJECTS/bot_toxic/tokenizer')
-    model = BertForSequenceClassification.from_pretrained('D:/PROJECTS/bot_toxic/model').to(DEVICE)
+    tokenizer = BertTokenizer.from_pretrained('tokenizer')
 except:
     tokenizer = BertTokenizer.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
+    tokenizer.save_pretrained('tokenizer')
+try:
+    model = BertForSequenceClassification.from_pretrained('model').to(DEVICE)
+except:
     model = BertForSequenceClassification.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier').to(DEVICE)
-    tokenizer.save_pretrained('D:/PROJECTS/bot_toxic/tokenizer')
-    model.save_pretrained('D:/PROJECTS/bot_toxic/model')
+    model.save_pretrained('model')
 
 
 class VkBot:

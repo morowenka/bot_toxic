@@ -1,6 +1,5 @@
-/venv/
-/model/
-/tokenizer/
 /__pycache__/
+/config/__pycache__/
 /.idea/
+/model/pytorch_model.bin
 /config/cfg.ini
