@@ -55,14 +55,15 @@ class VkBot:
         elif message.lower() == self.COMMANDS[3]:
             all_users_count = self.users.rows()
 
-            # проверка окончания, чтобы выглядело красиво
+            # проверка окончания
             def ending_check(num):
-                if num % 10 == 1:
-                    return 'ь'
-                elif num % 10 in (2, 3, 4):
-                    return 'я'
-                elif num % 10 in (5, 6, 7, 8, 9, 0):
-                    return 'ей'
+                match num % 10:
+                    case 1:
+                        return 'ь'
+                    case 2 | 3 | 4:
+                        return 'я'
+                    case _:
+                        return 'ей'
 
             if peer_id != user_id:
                 chat_users_count = self.chats.rows(peer_id)
@@ -79,7 +80,7 @@ class VkBot:
             data = self.vk.method('users.get', {'user_ids': ', '.join([str(i[0]) for i in top])})
             for i, value in enumerate(top):
                 name = data[i].get('first_name') + ' ' + data[i].get('last_name')
-                msg += f"{i + 1}. @id{user_id} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n"
+                msg += f'{i + 1}. @id{user_id} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
             self.send_message(peer_id, msg)
 
         elif message.lower() == self.COMMANDS[5]:
@@ -89,7 +90,7 @@ class VkBot:
                 data = self.vk.method('users.get', {'user_ids': ', '.join([str(i[0]) for i in top])})
                 for i, value in enumerate(top):
                     name = data[i].get('first_name') + ' ' + data[i].get('last_name')
-                    msg += f"{i + 1}. @id{user_id} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n"
+                    msg += f'{i + 1}. @id{user_id} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
                 self.send_message(peer_id, msg)
             else:
                 self.send_message(peer_id, f'чел.. это не беседа. никто не виноват, что у тебя нет друзей')
@@ -111,30 +112,29 @@ class VkBot:
         return f'@id{user_id} ({self.vk.method("users.get", {"user_ids": user_id})[0].get("first_name")})'
 
     def get_user_fullname(self, user_id):
-        user_data = self.vk.method("users.get", {"user_ids": user_id})[0]
+        user_data = self.vk.method('users.get', {'user_ids': user_id})[0]
         return f'@id{user_id} ({user_data.get("first_name") + " " + user_data.get("last_name")})'
 
     def get_user_data(self, user_id):
-
-        user_data = self.vk.method("users.get", {"user_ids": user_id,
-                                                 "fields": 'first_name, last_name, sex, bdate, '
+        user_data = self.vk.method('users.get', {'user_ids': user_id,
+                                                 'fields': 'first_name, last_name, sex, bdate, '
                                                            'country, city, personal, relation'})[0]
         user_dict_data = {
             'user_id': user_id,
-            'user_name': user_data.get("first_name"),
-            'user_surname': user_data.get("last_name"),
+            'user_name': user_data.get('first_name'),
+            'user_surname': user_data.get('last_name'),
             'user_first_login_date': date.isoformat(date.today()),
-            'user_sex': user_data.get("sex"),
-            'user_bdate': "-".join(user_data.get("bdate").split('.')[::-1]),
-            'user_country': user_data.get("country").get("title"),
-            'user_city': user_data.get("city").get("title"),
-            'user_political': user_data.get("personal").get("political"),
-            'user_religion': user_data.get("personal").get("religion"),
-            'user_relation': user_data.get("relation"),
-            'user_people_main': user_data.get("personal").get("people_main"),
-            'user_life_main': user_data.get("personal").get("life_main"),
-            'user_smoking': user_data.get("personal").get("smoking"),
-            'user_alcohol': user_data.get("personal").get("alcohol"),
+            'user_sex': user_data.get('sex'),
+            'user_bdate': '-'.join(user_data.get('bdate').split('.')[::-1]),
+            'user_country': user_data.get('country').get('title'),
+            'user_city': user_data.get('city').get('title'),
+            'user_political': user_data.get('personal').get('political'),
+            'user_religion': user_data.get('personal').get('religion'),
+            'user_relation': user_data.get('relation'),
+            'user_people_main': user_data.get('personal').get('people_main'),
+            'user_life_main': user_data.get('personal').get('life_main'),
+            'user_smoking': user_data.get('personal').get('smoking'),
+            'user_alcohol': user_data.get('personal').get('alcohol'),
         }
         return user_dict_data
 

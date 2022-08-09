@@ -1,11 +1,10 @@
 import vk_api
 import traceback
 import requests
-import torch
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_bot import VkBot
 from info import ChatsInfo, UsersInfo
-import helper
+from config import helper
 import warnings
 
 warnings.filterwarnings('ignore')

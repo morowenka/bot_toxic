@@ -3,5 +3,4 @@
 /tokenizer/
 /__pycache__/
 /.idea/
-/generate_config.py
-/cfg.ini
+/config/cfg.ini

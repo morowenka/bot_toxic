@@ -1,17 +1,18 @@
 import mysql.connector
-import helper
+from config import helper
 
 _CONFIG = helper.read_config()
 
 USER = _CONFIG['SQLServerSettings']['user']
 PASSWORD = _CONFIG['SQLServerSettings']['password']
 HOST = _CONFIG['SQLServerSettings']['host']
+DATABASE = _CONFIG['SQLServerSettings']['database']
 
 server_config = {
     'user': USER,
     'password': PASSWORD,
     'host': HOST,
-    'database': 'chats',
+    'database': DATABASE,
     'raise_on_warnings': False,
     'buffered': True
 }
@@ -50,6 +51,7 @@ class ChatsInfo:
         sql = f'''INSERT INTO chat_{peer_id} (vk_id)
                   VALUES (%s)
                '''
+        # здесь %s - это не string, а значение которое мы передаем вторым параметром в .execute
         cursor.execute(sql, user_id)
         cnx.commit()
 
@@ -139,6 +141,7 @@ class UsersInfo:
                     people_main, life_main, smoking, alcohol)
                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
               '''
+        # здесь %s - это значение из кортежа, который мы передаем вторым параметром в .execute
         cursor.execute(sql,
                        (user_id, user_name, user_surname, user_first_login_date, user_sex, user_bdate, user_country,
                         user_city, user_political, user_religion, user_relation, user_people_main, user_life_main,
