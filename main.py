@@ -23,7 +23,6 @@ def main():
     vk = vk_api.VkApi(token=TOKEN)
     vkbot = VkBot(vk, users, chats)
 
-    print('Bot is ready to start')
     while True:
         longpoll = VkBotLongPoll(vk, BOT_GROUP_ID)
 
@@ -48,7 +47,7 @@ def main():
 
                     vkbot.new_message(peer_id, user_id, message)
 
-        except requests.exceptions.ReadTimeout as timeout:
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as timeout:
             continue
 
         except Exception as e:
