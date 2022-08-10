@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  bot:
+    container_name: bot-toxic
+    labels:
+      description: Vk bot with toxic comments classification
+      name: vkbot-toxic
+    build: ./
+    image: bot-toxic
+    depends_on:
+      - db
+    environment:
+      DB_HOST: 'db'
+      DB_PORT: '3306'
+      DB_USER: 'my_user'
+      DB_PASSWORD: 'super_secret_password'
+      DB_NAME: 'chats'
+  db:
+    image: mysql:8.0.20
+    cap_add:
+      - SYS_NICE #для предотвращения бесполезных ошибок
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'chats'
+      MYSQL_USER: 'my_user'
+      MYSQL_PASSWORD: 'super_secret_password'
+      MYSQL_ROOT_PASSWORD: 'super_secret_password'
+    ports:
+      - '3306:3306'

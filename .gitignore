@@ -3,3 +3,4 @@
 /.idea/
 /model/pytorch_model.bin
 /config/cfg.ini
+/docker-compose.yml
