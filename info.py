@@ -50,7 +50,7 @@ class ChatsInfo:
                   VALUES (%s)
                '''
         # здесь %s - это не string, а значение которое мы передаем вторым параметром в .execute
-        cursor.execute(sql, user_id)
+        cursor.execute(sql, (user_id,))
         cnx.commit()
 
     def get_toxic_comments(self, peer_id, user_id):
