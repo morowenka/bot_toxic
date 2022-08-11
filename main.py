@@ -4,17 +4,15 @@ import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk_bot import VkBot
 from info import ChatsInfo, UsersInfo
-from config import helper
+import os
 import warnings
 
 warnings.filterwarnings('ignore')
 
-_CONFIG = helper.read_config()
-
 RANDOM_STATE = 42
 BOT_GROUP_ID = 214806981  # id группы с ботом
-BUG_CHAT_ID = _CONFIG['VkSettings']['bug_chat_id']  # peer_id чата, в который будут приходить сообщения с ошибками
-TOKEN = _CONFIG['VkSettings']['token']
+BUG_CHAT_ID = os.environ.get('VK_BUG_CHAT_ID')  # peer_id чата, в который будут приходить сообщения с ошибками
+TOKEN = os.environ.get('VK_TOKEN')
 
 
 def main():
