@@ -1,6 +1,5 @@
 /__pycache__/
-/config/__pycache__/
 /.idea/
-/model/pytorch_model.bin
-/config/cfg.ini
-/docker-compose.yml
+model/pytorch_model.bin
+docker-compose.yml
+.env
