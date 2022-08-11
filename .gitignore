@@ -1,9 +1,4 @@
 /__pycache__/
 /.idea/
 model/pytorch_model.bin
-<<<<<<< HEAD
 .env
-=======
-docker-compose.yml
-.env
->>>>>>> f404bbb0af4bccc56e142f0332ce618f00754fe4
