@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  bot:
+    container_name: toxic-bot
+    labels:
+      description: Vk bot with toxic comments classification
+      name: vkbot-toxic
+    build: ./
+    image: toxic-bot
+    depends_on:
+      - db
+    command: sh -c "sleep 60; python3 ./main.py"
+    env_file: .env
+  db: #=MYSQL_HOST
+    image: mysql:8.0.20
+    cap_add:
+      - SYS_NICE #для предотвращения бесполезных ошибок
+    restart: always
+    env_file: .env
+    ports:
+      - '3306:3306'
