@@ -32,7 +32,7 @@ class VkBot:
         elif message.lower()[:4] == self.COMMANDS[1]:
             message = message.lower()[4:]
             toxicity_class, toxicity_level = self.compute_toxicity(message)
-            emoji = ['&#128545;', '&#128522;'][toxicity_level < 0.5]
+            emoji = ['&#128545;', '&#128522;'][toxicity_level < 50]
             self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваше сообщение является {toxicity_class} {emoji}.\n\
                                   Уровень токсичности: {toxicity_level:.2f}%.')
 
@@ -99,8 +99,8 @@ class VkBot:
         else:
             toxicity_class, toxicity_level = self.compute_toxicity(message)
             if peer_id != user_id:
-                self.users.update(user_id, toxicity_level > 0.5)
-                self.chats.update(peer_id, user_id, toxicity_level > 0.5)
+                self.users.update(user_id, toxicity_level > 50)
+                self.chats.update(peer_id, user_id, toxicity_level > 50)
 
     def send_message(self, peer_id, message):
         self.vk.method('messages.send', {'peer_id': peer_id,
@@ -127,16 +127,16 @@ class VkBot:
             'user_surname': user_data.get('last_name'),
             'user_first_login_date': date.isoformat(date.today()),
             'user_sex': user_data.get('sex'),
-            'user_bdate': '-'.join(user_data.get('bdate').split('.')[::-1]),
-            'user_country': user_data.get('country').get('title'),
-            'user_city': user_data.get('city').get('title'),
-            'user_political': user_data.get('personal').get('political'),
-            'user_religion': user_data.get('personal').get('religion'),
+            'user_bdate': '-'.join(user_data.get('bdate').split('.')[::-1]) if user_data.get('bdate') else None,
+            'user_country': user_data.get('country').get('title') if user_data.get('country') else None,
+            'user_city': user_data.get('city').get('title') if user_data.get('city') else None,
+            'user_political': user_data.get('personal').get('political') if user_data.get('personal') else None,
+            'user_religion': user_data.get('personal').get('religion') if user_data.get('personal') else None,
             'user_relation': user_data.get('relation'),
-            'user_people_main': user_data.get('personal').get('people_main'),
-            'user_life_main': user_data.get('personal').get('life_main'),
-            'user_smoking': user_data.get('personal').get('smoking'),
-            'user_alcohol': user_data.get('personal').get('alcohol'),
+            'user_people_main': user_data.get('personal').get('people_main') if user_data.get('personal') else None,
+            'user_life_main': user_data.get('personal').get('life_main') if user_data.get('personal') else None,
+            'user_smoking': user_data.get('personal').get('smoking') if user_data.get('personal') else None,
+            'user_alcohol': user_data.get('personal').get('alcohol') if user_data.get('personal') else None,
         }
         return user_dict_data
 
