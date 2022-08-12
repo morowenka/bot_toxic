@@ -2,7 +2,8 @@ import vk_api
 import traceback
 import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from vk_bot import VkBot
+from vk.vk_bot import VkBot
+from vk.vklongpoll import MyVkBotLongPoll
 from info import ChatsInfo, UsersInfo
 import os
 import warnings
@@ -21,10 +22,11 @@ def main():
     vk = vk_api.VkApi(token=TOKEN)
     vkbot = VkBot(vk, users, chats)
 
+    print('Bot is ready to start')
     while True:
-        longpoll = VkBotLongPoll(vk, BOT_GROUP_ID)
-
         try:
+            longpoll = MyVkBotLongPoll(vk, BOT_GROUP_ID)
+
             for event in longpoll.listen():
                 if event.type == VkBotEventType.MESSAGE_NEW:
                     event_obj = event.obj.get('message')
@@ -55,6 +57,7 @@ def main():
                   &#128140; Текст сообщения: {message}\n\n\
                   &#9881; Описание ошибки:\n\n {traceback.format_exc()}'
             vkbot.send_message(BUG_CHAT_ID, error)
+            continue
 
 
 if __name__ == '__main__':
