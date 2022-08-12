@@ -6,6 +6,7 @@ from datetime import date
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+# проверка на случай, если модель и токенизатор уже установлены
 try:
     tokenizer = BertTokenizer.from_pretrained('tokenizer')
 except:
@@ -32,9 +33,9 @@ class VkBot:
         elif message.lower()[:4] == self.COMMANDS[1]:
             message = message.lower()[4:]
             toxicity_class, toxicity_level = self.compute_toxicity(message)
-            emoji = ['&#128545;', '&#128522;'][toxicity_level < 50]
+            emoji = ['&#128545;', '&#128522;'][toxicity_level < 0.5]
             self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваше сообщение является {toxicity_class} {emoji}.\n\
-                                  Уровень токсичности: {toxicity_level:.2f}%.')
+                                  Уровень токсичности: {toxicity_level*100:.2f}%.')
 
         elif message.lower() == self.COMMANDS[2]:
             rating = self.rating_calc(self.users.get_toxic_comments(user_id), self.users.get_all_comments(user_id))
@@ -79,7 +80,7 @@ class VkBot:
         elif message.lower() == self.COMMANDS[4]:
             msg = 'Топ токсичных пользователей за все время\n[&#128545; токсичные | &#9993; все | &#127942; рейтинг токсичности]\n'
             top = self.users.get_top_n(10)
-            data = self.vk.method('users.get', {'user_ids': ', '.join([str(i[0]) for i in top])})
+            data = self.get_user_data(', '.join([str(i[0]) for i in top]))
             for i, value in enumerate(top):
                 name = data[i].get('first_name') + ' ' + data[i].get('last_name')
                 msg += f'{i + 1}. @id{value[0]} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
@@ -89,7 +90,7 @@ class VkBot:
             if peer_id != user_id:
                 msg = 'Топ токсичных пользователей этой беседы за все время\n[&#128545; токсичные | &#9993; все | &#127942; рейтинг токсичности]\n'
                 top = self.chats.get_top_n(peer_id, 10)
-                data = self.vk.method('users.get', {'user_ids': ', '.join([str(i[0]) for i in top])})
+                data = self.get_user_data(', '.join([str(i[0]) for i in top]))
                 for i, value in enumerate(top):
                     name = data[i].get('first_name') + ' ' + data[i].get('last_name')
                     msg += f'{i + 1}. @id{value[0]} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
@@ -99,8 +100,8 @@ class VkBot:
         else:
             toxicity_class, toxicity_level = self.compute_toxicity(message)
             if peer_id != user_id:
-                self.users.update(user_id, toxicity_level > 50)
-                self.chats.update(peer_id, user_id, toxicity_level > 50)
+                self.users.update(user_id, toxicity_level > 0.5)
+                self.chats.update(peer_id, user_id, toxicity_level > 0.5)
 
     def send_message(self, peer_id, message):
         self.vk.method('messages.send', {'peer_id': peer_id,
@@ -110,17 +111,23 @@ class VkBot:
     def rating_calc(self, toxic, all):
         return pow(toxic, 2) / all if all != 0 else 0
 
+    def get_user_data(self, user_id, fields='first_name, last_name'):
+        try:
+            return self.vk.method('users.get', {'user_ids': user_id,
+                                                'fields': fields})[0]
+        except IndexError:
+            return self.vk.method('users.get', {'user_ids': user_id,
+                                                'fields': fields})
+
     def get_user_name(self, user_id):
-        return f'@id{user_id} ({self.vk.method("users.get", {"user_ids": user_id})[0].get("first_name")})'
+        return f'@id{user_id} ({self.get_user_data(user_id).get("first_name")})'
 
     def get_user_fullname(self, user_id):
-        user_data = self.vk.method('users.get', {'user_ids': user_id})[0]
-        return f'@id{user_id} ({user_data.get("first_name") + " " + user_data.get("last_name")})'
+        return f'@id{user_id} ({self.get_user_data(user_id).get("first_name") + " " + self.get_user_data(user_id).get("last_name")})'
 
     def get_user_data(self, user_id):
-        user_data = self.vk.method('users.get', {'user_ids': user_id,
-                                                 'fields': 'first_name, last_name, sex, bdate, '
-                                                           'country, city, personal, relation'})[0]
+        user_data = self.get_user_data(user_id, 'first_name, last_name, sex, bdate, '
+                                                'country, city, personal, relation')
         user_dict_data = {
             'user_id': user_id,
             'user_name': user_data.get('first_name'),
@@ -144,4 +151,4 @@ class VkBot:
         input = tokenizer.encode(message, return_tensors='pt')
         output = F.softmax(model(input).logits.data, dim=1)[0, 1]
         toxicity_class = ['нетоксичным', 'токсичным'][output > 0.5]
-        return toxicity_class, float(output) * 100
+        return toxicity_class, float(output)

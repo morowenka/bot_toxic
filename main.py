@@ -3,7 +3,6 @@ import traceback
 import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk.vk_bot import VkBot
-from vk.vklongpoll import MyVkBotLongPoll
 from info import ChatsInfo, UsersInfo
 import os
 import warnings
@@ -11,7 +10,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 RANDOM_STATE = 42
-BOT_GROUP_ID = 214806981  # id группы с ботом
+BOT_GROUP_ID = os.environ.get('VK_BOT_GROUP_ID')  # id группы с ботом
 BUG_CHAT_ID = os.environ.get('VK_BUG_CHAT_ID')  # peer_id чата, в который будут приходить сообщения с ошибками
 TOKEN = os.environ.get('VK_TOKEN')
 
@@ -25,7 +24,7 @@ def main():
     print('Bot is ready to start')
     while True:
         try:
-            longpoll = MyVkBotLongPoll(vk, BOT_GROUP_ID)
+            longpoll = VkBotLongPoll(vk, BOT_GROUP_ID)
 
             for event in longpoll.listen():
                 if event.type == VkBotEventType.MESSAGE_NEW:
