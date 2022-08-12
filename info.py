@@ -40,10 +40,8 @@ class ChatsInfo:
                            WHERE vk_id={user_id}
                         ''')
         cnx.commit()
-        if cursor.fetchone():
-            return True
-        else:
-            return False
+        return cursor.fetchone()
+
 
     def insert_user(self, peer_id, user_id):
         sql = f'''INSERT INTO chat_{peer_id} (vk_id)
@@ -125,10 +123,7 @@ class UsersInfo:
                            WHERE vk_id={user_id}
                         ''')
         cnx.commit()
-        if cursor.fetchone():
-            return True
-        else:
-            return False
+        return cursor.fetchone()
 
     def insert_user(self, user_id, user_name, user_surname, user_first_login_date, user_sex, user_bdate, user_country,
                     user_city, user_political, user_religion, user_relation, user_people_main, user_life_main,

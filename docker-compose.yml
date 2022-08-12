@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   bot:
-    container_name: toxic-bot
+    container_name: bot-toxic
     labels:
       description: Vk bot with toxic comments classification
-      name: vkbot-toxic
+      name: toxic-vkbot
     build: ./
-    image: toxic-bot
+    image: bot-toxic
     depends_on:
       - db
     command: sh -c "sleep 60; python3 ./main.py"

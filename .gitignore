@@ -1,4 +1,4 @@
-/__pycache__/
-/.idea/
+*.pyc
+.idea/
 model/pytorch_model.bin
 .env

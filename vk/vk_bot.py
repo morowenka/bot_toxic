@@ -82,7 +82,7 @@ class VkBot:
             data = self.vk.method('users.get', {'user_ids': ', '.join([str(i[0]) for i in top])})
             for i, value in enumerate(top):
                 name = data[i].get('first_name') + ' ' + data[i].get('last_name')
-                msg += f'{i + 1}. @id{user_id} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
+                msg += f'{i + 1}. @id{value[0]} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
             self.send_message(peer_id, msg)
 
         elif message.lower() == self.COMMANDS[5]:
@@ -92,7 +92,7 @@ class VkBot:
                 data = self.vk.method('users.get', {'user_ids': ', '.join([str(i[0]) for i in top])})
                 for i, value in enumerate(top):
                     name = data[i].get('first_name') + ' ' + data[i].get('last_name')
-                    msg += f'{i + 1}. @id{user_id} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
+                    msg += f'{i + 1}. @id{value[0]} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
                 self.send_message(peer_id, msg)
             else:
                 self.send_message(peer_id, f'чел.. это не беседа. никто не виноват, что у тебя нет друзей')
