@@ -42,7 +42,7 @@ class VkBot:
             if peer_id != user_id:
                 chat_rating = self.rating_calc(self.chats.get_toxic_comments(peer_id, user_id),
                                                self.chats.get_all_comments(peer_id, user_id))
-                self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваша статистика:\n\n\
+                self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваша статистика:\n\
                                     &#9993; Всего сообщений: {self.users.get_all_comments(user_id)}.\n\
                                     &#128545; Всего токсичных сообщений: {self.users.get_toxic_comments(user_id)}.\n\
                                     &#127942; Общий рейтинг токсичности: {rating:.2f}\n\
@@ -50,7 +50,7 @@ class VkBot:
                                     &#128545; Токсичных сообщений в этой беседе: {self.chats.get_toxic_comments(peer_id, user_id)}.\n\
                                     &#127942; Рейтинг токсичности в этой беседе: {chat_rating:.2f}')
             else:
-                self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваша статистика:\n\n\
+                self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваша статистика:\n\
                                     &#9993; Всего сообщений: {self.users.get_all_comments(user_id)}.\n\
                                     &#128545; Всего токсичных сообщений: {self.users.get_toxic_comments(user_id)}.\n\
                                     &#127942; Общий рейтинг токсичности: {rating:.2f}')
@@ -80,20 +80,18 @@ class VkBot:
         elif message.lower() == self.COMMANDS[4]:
             msg = 'Топ токсичных пользователей за все время\n[&#128545; токсичные | &#9993; все | &#127942; рейтинг токсичности]\n'
             top = self.users.get_top_n(10)
-            data = self.get_user_data(', '.join([str(i[0]) for i in top]))
             for i, value in enumerate(top):
-                name = data[i].get('first_name') + ' ' + data[i].get('last_name')
-                msg += f'{i + 1}. @id{value[0]} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
+                name = self.get_user_fullname(value[0])
+                msg += f'{i + 1}. {name}: {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
             self.send_message(peer_id, msg)
 
         elif message.lower() == self.COMMANDS[5]:
             if peer_id != user_id:
                 msg = 'Топ токсичных пользователей этой беседы за все время\n[&#128545; токсичные | &#9993; все | &#127942; рейтинг токсичности]\n'
                 top = self.chats.get_top_n(peer_id, 10)
-                data = self.get_user_data(', '.join([str(i[0]) for i in top]))
                 for i, value in enumerate(top):
-                    name = data[i].get('first_name') + ' ' + data[i].get('last_name')
-                    msg += f'{i + 1}. @id{value[0]} ({name}): {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
+                    name = self.get_user_fullname(value[0])
+                    msg += f'{i + 1}. {name}: {value[1]} | {value[2]} | {(value[3] if value[3] else 0):.2f}\n'
                 self.send_message(peer_id, msg)
             else:
                 self.send_message(peer_id, f'чел.. это не беседа. никто не виноват, что у тебя нет друзей')
@@ -125,7 +123,7 @@ class VkBot:
     def get_user_fullname(self, user_id):
         return f'@id{user_id} ({self.get_user_data(user_id).get("first_name") + " " + self.get_user_data(user_id).get("last_name")})'
 
-    def get_user_data(self, user_id):
+    def get_all_user_data(self, user_id):
         user_data = self.get_user_data(user_id, 'first_name, last_name, sex, bdate, '
                                                 'country, city, personal, relation')
         user_dict_data = {
@@ -148,6 +146,8 @@ class VkBot:
         return user_dict_data
 
     def compute_toxicity(self, message):
+        # модель обрабатывает сообщения только длиной меньше 512
+        message = message if len(message) < 512 else message[:512]
         input = tokenizer.encode(message, return_tensors='pt')
         output = F.softmax(model(input).logits.data, dim=1)[0, 1]
         toxicity_class = ['нетоксичным', 'токсичным'][output > 0.5]

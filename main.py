@@ -38,11 +38,11 @@ def main():
                         if not chats.is_reg(peer_id, user_id):
                             chats.insert_user(peer_id, user_id)
                         if not users.is_reg(user_id):
-                            users.insert_user(**vkbot.get_user_data(user_id))
+                            users.insert_user(**vkbot.get_all_user_data(user_id))
 
                     if event.from_user:
                         if not users.is_reg(user_id):
-                            users.insert_user(**vkbot.get_user_data(user_id))
+                            users.insert_user(**vkbot.get_all_user_data(user_id))
 
                     vkbot.new_message(peer_id, user_id, message)
 
