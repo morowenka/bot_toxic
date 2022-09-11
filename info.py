@@ -14,8 +14,13 @@ server_config = {
     'raise_on_warnings': False,
     'buffered': True
 }
+
 cnx = mysql.connector.connect(**server_config)
 cursor = cnx.cursor()
+def refresh_connection():
+    cnx.close()
+    cnx = mysql.connector.connect(**server_config)
+    cursor = cnx.cursor()
 
 
 class ChatsInfo:

@@ -43,12 +43,12 @@ class VkBot:
                 chat_rating = self.rating_calc(self.chats.get_toxic_comments(peer_id, user_id),
                                                self.chats.get_all_comments(peer_id, user_id))
                 self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваша статистика:\n\
-                                    &#9993; Всего сообщений: {self.users.get_all_comments(user_id)}.\n\
-                                    &#128545; Всего токсичных сообщений: {self.users.get_toxic_comments(user_id)}.\n\
-                                    &#127942; Общий рейтинг токсичности: {rating:.2f}\n\
-                                    &#9993; Сообщений в этой беседе: {self.chats.get_all_comments(peer_id, user_id)}.\n\
-                                    &#128545; Токсичных сообщений в этой беседе: {self.chats.get_toxic_comments(peer_id, user_id)}.\n\
-                                    &#127942; Рейтинг токсичности в этой беседе: {chat_rating:.2f}')
+                                    &#9993;Всего сообщений: {self.users.get_all_comments(user_id)}.\n\
+                                    &#128545;Всего токсичных сообщений: {self.users.get_toxic_comments(user_id)}.\n\
+                                    &#127942;Общий рейтинг токсичности: {rating:.2f}\n\
+                                    &#9993;Сообщений в этой беседе: {self.chats.get_all_comments(peer_id, user_id)}.\n\
+                                    &#128545;Токсичных сообщений в этой беседе: {self.chats.get_toxic_comments(peer_id, user_id)}.\n\
+                                    &#127942;Рейтинг токсичности в этой беседе: {chat_rating:.2f}')
             else:
                 self.send_message(peer_id, f'{self.get_user_name(user_id)}, ваша статистика:\n\
                                     &#9993; Всего сообщений: {self.users.get_all_comments(user_id)}.\n\

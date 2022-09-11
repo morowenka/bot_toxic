@@ -3,6 +3,7 @@ import traceback
 import requests
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from vk.vk_bot import VkBot
+import info
 from info import ChatsInfo, UsersInfo
 import os
 import warnings
@@ -21,10 +22,10 @@ def main():
     vk = vk_api.VkApi(token=TOKEN)
     vkbot = VkBot(vk, users, chats)
 
-    print('Bot is ready to start')
     while True:
         try:
             longpoll = VkBotLongPoll(vk, BOT_GROUP_ID)
+            print('Bot is ready to start')
 
             for event in longpoll.listen():
                 if event.type == VkBotEventType.MESSAGE_NEW:
@@ -33,20 +34,25 @@ def main():
                     peer_id = event_obj.get('peer_id')
                     message = event_obj.get('text')
 
-                    if event.from_chat:
+                    if event.from_group:
+                        continue
+                    elif event.from_chat:
                         chats.create_table(peer_id)
                         if not chats.is_reg(peer_id, user_id):
                             chats.insert_user(peer_id, user_id)
                         if not users.is_reg(user_id):
                             users.insert_user(**vkbot.get_all_user_data(user_id))
-
-                    if event.from_user:
+                    elif event.from_user:
                         if not users.is_reg(user_id):
                             users.insert_user(**vkbot.get_all_user_data(user_id))
 
                     vkbot.new_message(peer_id, user_id, message)
 
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as timeout:
+            continue
+
+        except mysql.connector.errors.OperationalError:
+            info.refresh_connection()
             continue
 
         except Exception as e:
