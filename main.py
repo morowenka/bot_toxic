@@ -6,6 +6,7 @@ from vk.vk_bot import VkBot
 import info
 from info import ChatsInfo, UsersInfo
 import os
+import mysql
 import warnings
 
 warnings.filterwarnings('ignore')
