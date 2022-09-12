@@ -110,13 +110,11 @@ class VkBot:
         return pow(toxic, 2) / all if all != 0 else 0
 
     def get_user_data(self, user_id, fields='first_name, last_name'):
-        try:
-            return self.vk.method('users.get', {'user_ids': user_id,
-                                                'fields': fields})[0]
-        except IndexError:
-            return self.vk.method('users.get', {'user_ids': user_id,
-                                                'fields': fields})
-
+        user_data = self.vk.method('users.get', {'user_ids': user_id,
+                                                 'fields': fields})
+        while isinstance(user_data, list):
+            user_data = user_data[0]
+        return user_data
     def get_user_name(self, user_id):
         return f'@id{user_id} ({self.get_user_data(user_id).get("first_name")})'
 
