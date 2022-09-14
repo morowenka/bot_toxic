@@ -112,8 +112,13 @@ class VkBot:
     def get_user_data(self, user_id, fields='first_name, last_name'):
         user_data = self.vk.method('users.get', {'user_ids': user_id,
                                                  'fields': fields})
-        while isinstance(user_data, list):
-            user_data = user_data[0]
+        try:
+            if isinstance(user_data, list):
+                user_data = user_data[0]
+        except:
+            print(user_data, '\n\n')
+            print(self.vk.method('users.get', {'user_ids': user_id,
+                                                 'fields': fields}))
         return user_data
     def get_user_name(self, user_id):
         return f'@id{user_id} ({self.get_user_data(user_id).get("first_name")})'
