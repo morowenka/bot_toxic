@@ -1,7 +1,7 @@
 FROM python:3.10
 
 MAINTAINER Mark Basov
-LABEL version="0.1.6-beta"
+LABEL version="0.1.7-beta"
 
 WORKDIR /home
 COPY . ./
