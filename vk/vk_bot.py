@@ -113,10 +113,11 @@ class VkBot:
         user_data = self.vk.method('users.get', {'user_ids': user_id,
                                                  'fields': fields})
         try:
-            if isinstance(user_data, list):
+            if isinstance(user_data, list) and user_data:
                 user_data = user_data[0]
         except:
-            print(user_data, '\n\n')
+            print(user_data, '\n----------\n')
+            print(user_id, '\n----------\n')
             print(self.vk.method('users.get', {'user_ids': user_id,
                                                  'fields': fields}))
         return user_data
