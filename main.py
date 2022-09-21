@@ -56,6 +56,11 @@ def main():
             info.refresh_connection()
             continue
 
+        except vk_api.exceptions.ApiHttpError:
+            vk = vk_api.VkApi(token=TOKEN)
+            vkbot = VkBot(vk, users, chats)
+            continue
+
         except Exception as e:
             error = f'&#9888; Ошибка: {e}\n\
                   &#128169; Пользователь: {vkbot.get_user_fullname(user_id)}\n\
