@@ -120,6 +120,13 @@ class VkBot:
             print(user_id, '\n----------\n')
             print(self.vk.method('users.get', {'user_ids': user_id,
                                                  'fields': fields}))
+        try:
+            user_data.get('first_name')
+        except:
+            print('\n----------\n', user_data, '\n----------\n')
+            print(user_id, '\n----------\n')
+            print(self.vk.method('users.get', {'user_ids': user_id,
+                                               'fields': fields}))
         return user_data
     def get_user_name(self, user_id):
         return f'@id{user_id} ({self.get_user_data(user_id).get("first_name")})'
